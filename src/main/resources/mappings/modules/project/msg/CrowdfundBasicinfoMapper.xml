@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.milliongravity.modules.dao.project.msg.CrowdfundBasicinfoDao" >
+  <resultMap id="BaseResultMap" type="com.etnlgravtnl.modules.model.CrowdfundBasicinfo" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="PROJECT_NO" property="projectNo" jdbcType="INTEGER" />
+    <result column="USER_ID" property="userId" jdbcType="INTEGER" />
+    <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+    <result column="PROJECT_TYPE" property="projectType" jdbcType="VARCHAR" />
+    <result column="PROJECT_CATEGORY" property="projectCategory" jdbcType="VARCHAR" />
+    <result column="PROJECT_LOCATION_PROVINCE" property="projectLocationProvince" jdbcType="VARCHAR" />
+    <result column="PROJECT_LOCATION_CITY" property="projectLocationCity" jdbcType="VARCHAR" />
+    <result column="PROJECT_LOCATION_DISTRICT" property="projectLocationDistrict" jdbcType="VARCHAR" />
+    <result column="PROJECT_LOCATION_DETAIL" property="projectLocationDetail" jdbcType="VARCHAR" />
+    <result column="PROJECT_SYNOPSIS" property="projectSynopsis" jdbcType="VARCHAR" />
+    <result column="PROJECT_SUMMARY" property="projectSummary" jdbcType="VARCHAR" />
+    <result column="PROJECT_STATE" property="projectState" jdbcType="VARCHAR" />
+    <result column="ORGANIZER_NO" property="organizerNo" jdbcType="SMALLINT" />
+    <result column="FUND_AMT" property="fundAmt" jdbcType="DECIMAL" />
+    <result column="FUND_LIMIT_AMT" property="fundLimitAmt" jdbcType="DECIMAL" />
+    <result column="FUND_TOTAL_AMT" property="fundTotalAmt" jdbcType="VARCHAR" />
+    <result column="FUND_PERIOD" property="fundPeriod" jdbcType="SMALLINT" />
+    <result column="LASTING_FUND_FLAG" property="lastingFundFlag" jdbcType="BIT" />
+    <result column="PREPARE_PERIOD" property="preparePeriod" jdbcType="SMALLINT" />
+    <result column="PROJECT_VIDEO" property="projectVideo" jdbcType="VARCHAR" />
+    <result column="PROJECT_LIST_IMAGE" property="projectListImage" jdbcType="VARCHAR" />
+    <result column="PROJECT_IMAGE" property="projectImage" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="RELEASES_TIME" property="releasesTime" jdbcType="TIMESTAMP" />
+    <result column="SHELVES_TIME" property="shelvesTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, PROJECT_NO, USER_ID, PROJECT_NAME, PROJECT_TYPE, PROJECT_CATEGORY, PROJECT_LOCATION_PROVINCE,
+    PROJECT_LOCATION_CITY, PROJECT_LOCATION_DISTRICT, PROJECT_LOCATION_DETAIL, PROJECT_SYNOPSIS,
+    PROJECT_SUMMARY, PROJECT_STATE, ORGANIZER_NO, FUND_AMT, FUND_LIMIT_AMT, FUND_TOTAL_AMT,
+    FUND_PERIOD, LASTING_FUND_FLAG, PREPARE_PERIOD, PROJECT_VIDEO, PROJECT_LIST_IMAGE,
+    PROJECT_IMAGE, CREATE_TIME, RELEASES_TIME, SHELVES_TIME
+  </sql>
+
+  <select id="queryBy" parameterType="com.etnlgravtnl.modules.webservice.project.vo.CrowdfundBasicinfoVo" resultType="java.lang.Long">
+    SELECT COUNT(*) FROM crowdfund_basicinfo cb
+    WHERE cb.user_id=#{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="getListLaunch" parameterType="com.etnlgravtnl.modules.webservice.project.vo.CrowdfundBasicinfoVo" resultType="com.etnlgravtnl.modules.model.CrowdfundBasicinfo">
+    SELECT
+    CB.PROJECT_NAME,CB.PROJECT_IMAGE,CB.PROJECT_SUMMARY,CB.RELEASES_TIME
+    FROM crowdfund_basicinfo CB
+    WHERE cb.user_id=#{id,jdbcType=INTEGER}
+    limit #{page},#{rows}
+  </select>
+</mapper>

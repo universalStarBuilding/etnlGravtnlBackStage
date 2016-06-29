@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.milliongravity.modules.dao.project.msg.CrowdfundIfmtDscleDao" >
+  <resultMap id="BaseResultMap" type="com.etnlgravtnl.modules.model.CrowdfundIfmtDscle" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="PROJECT_NO" property="projectNo" jdbcType="INTEGER" />
+    <result column="DSCL_USER" property="dsclUser" jdbcType="INTEGER" />
+    <result column="IFMT_TYPE" property="ifmtType" jdbcType="VARCHAR" />
+    <result column="IFMT_CONTENT_DESC" property="ifmtContentDesc" jdbcType="VARCHAR" />
+    <result column="DSCL_NODE" property="dsclNode" jdbcType="VARCHAR" />
+    <result column="STATE" property="state" jdbcType="VARCHAR" />
+    <result column="DSCL_TIME" property="dsclTime" jdbcType="TIMESTAMP" />
+    <result column="AUDITOR" property="auditor" jdbcType="INTEGER" />
+    <result column="AUDIT_TIME" property="auditTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, PROJECT_NO, DSCL_USER, IFMT_TYPE, IFMT_CONTENT_DESC, DSCL_NODE, STATE, DSCL_TIME, 
+    AUDITOR, AUDIT_TIME
+  </sql>
+  <insert id="insert" parameterType="com.etnlgravtnl.modules.model.CrowdfundIfmtDscle" >
+    insert into crowdfund_ifmt_dscle (PROJECT_NO, DSCL_USER,
+    IFMT_TYPE, IFMT_CONTENT_DESC, DSCL_NODE,
+    STATE, DSCL_TIME, AUDITOR,
+    AUDIT_TIME)
+    values ( #{projectNo,jdbcType=INTEGER}, #{dsclUser,jdbcType=INTEGER},
+    #{ifmtType,jdbcType=VARCHAR}, #{ifmtContentDesc,jdbcType=VARCHAR}, #{dsclNode,jdbcType=VARCHAR},
+    #{state,jdbcType=VARCHAR}, #{dsclTime,jdbcType=TIMESTAMP}, #{auditor,jdbcType=INTEGER},
+    #{auditTime,jdbcType=TIMESTAMP})
+  </insert>
+
+</mapper>

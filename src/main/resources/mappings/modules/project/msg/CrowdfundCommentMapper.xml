@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.milliongravity.modules.dao.project.msg.CrowdfundCommentDao" >
+  <resultMap id="BaseResultMap" type="com.etnlgravtnl.modules.model.CrowdfundComment" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="TOPIC_ID" property="topicId" jdbcType="INTEGER" />
+    <result column="TOPIC_TYPE" property="topicType" jdbcType="VARCHAR" />
+    <result column="CONTENT" property="content" jdbcType="VARCHAR" />
+    <result column="FROM_UID" property="fromUid" jdbcType="INTEGER" />
+    <result column="COMMENT_DATE" property="commentDate" jdbcType="TIMESTAMP" />
+    <result column="STATUS" property="status" jdbcType="BIT" />
+    <result column="AUDIT_ID" property="auditId" jdbcType="INTEGER" />
+    <result column="AUDIT_DATE" property="auditDate" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, TOPIC_ID, TOPIC_TYPE, CONTENT, FROM_UID, COMMENT_DATE, STATUS, AUDIT_ID, AUDIT_DATE
+  </sql>
+
+  <select id="queryById" parameterType="com.etnlgravtnl.modules.webservice.project.vo.CrowdfundBasicinfoVo" resultType="java.lang.Long">
+    SELECT COUNT(*) FROM crowdfund_comment CC,crowdfund_basicinfo CB
+    WHERE CC.TOPIC_ID=CB.PROJECT_NO
+    AND CC.TOPIC_ID=#{topicId,jdbcType=INTEGER}
+  </select>
+  <select id="getListCrowdfund" parameterType="com.etnlgravtnl.modules.webservice.project.vo.CrowdfundBasicinfoVo" resultType="com.etnlgravtnl.modules.model.CrowdfundBasicinfo">
+    SELECT PROJECT_NO,PROJECT_NAME,PROJECT_SYNOPSIS,PROJECT_IMAGE
+    FROM crowdfund_comment CC,crowdfund_basicinfo CB
+    WHERE CC.TOPIC_ID=CB.PROJECT_NO
+    AND CC.TOPIC_ID=#{topicId,jdbcType=INTEGER}
+    limit #{page},#{rows}
+  </select>
+</mapper>

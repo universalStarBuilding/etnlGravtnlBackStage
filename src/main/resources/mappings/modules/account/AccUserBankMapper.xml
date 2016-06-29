@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.milliongravity.modules.dao.account.AccUserBankDao" >
+  <resultMap id="BaseResultMap" type="com.etnlgravtnl.modules.model.AccUserBank" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="USER_ID" property="userId" jdbcType="INTEGER" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="BANK_NO" property="bankNo" jdbcType="VARCHAR" />
+    <result column="BANK_ACCOUNT" property="bankAccount" jdbcType="VARCHAR" />
+    <result column="OWNER_NAME" property="ownerName" jdbcType="VARCHAR" />
+    <result column="OPEN_ACCT_BANK" property="openAcctBank" jdbcType="VARCHAR" />
+    <result column="BANK_TYPE" property="bankType" jdbcType="VARCHAR" />
+    <result column="BANK_CITY_ID" property="bankCityId" jdbcType="INTEGER" />
+    <result column="BANK_PROVINCE_ID" property="bankProvinceId" jdbcType="INTEGER" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="STATE" property="state" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, USER_ID, NAME, BANK_NO, BANK_ACCOUNT, OWNER_NAME, OPEN_ACCT_BANK, BANK_TYPE, 
+    BANK_CITY_ID, BANK_PROVINCE_ID, CREATE_TIME, STATE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from acc_user_bank
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from acc_user_bank
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.etnlgravtnl.modules.model.AccUserBank" >
+    insert into acc_user_bank (
+    USER_ID, NAME, BANK_NO, BANK_ACCOUNT, OWNER_NAME, OPEN_ACCT_BANK, BANK_TYPE,
+    BANK_CITY_ID, BANK_PROVINCE_ID, CREATE_TIME, STATE
+    )
+    values ( #{userId,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{bankNo,jdbcType=VARCHAR},#{bankAccount,jdbcType=VARCHAR},#{ownerName,jdbcType=VARCHAR},
+        #{openAcctBank,jdbcType=VARCHAR},
+        #{bankType,jdbcType=VARCHAR},
+        #{bankCityId,jdbcType=VARCHAR},
+        #{bankProvinceId,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{state,jdbcType=TINYINT}
+    )
+  </insert>
+  <select id="getUserBank" resultType="java.lang.String" parameterType="java.lang.Integer">
+    SELECT COUNT(*) FROM acc_user_bank
+    WHERE USER_ID = #{userId,jdbcType=INTEGER}
+  </select>
+</mapper>
+      <!--  `NAME`=#{name,jdbcType=VARCHAR},
+        BANK_NO = #{bankNo,jdbcType=VARCHAR},
+        BANK_ACCOUNT = #{bankAccount,jdbcType=VARCHAR},
+        OWNER_NAME = #{ownerName,jdbcType=VARCHAR},
+        OPEN_ACCT_BANK =#{openAcctBank,jdbcType=VARCHAR},
+        BANK_TYPE =#{bankType,jdbcType=VARCHAR},
+        BANK_CITY_ID =#{bankCityId,jdbcType=VARCHAR},
+        BANK_PROVINCE_ID = #{bankProvinceId,jdbcType=VARCHAR},
+        CREATE_TIME =#{createTime,jdbcType=TIMESTAMP},
+        STATE = #{state,jdbcType=TINYINT}-->

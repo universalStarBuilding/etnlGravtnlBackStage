@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.milliongravity.modules.dao.project.returnset.CrowdfundReturnsetDao" >
+  <resultMap id="BaseResultMap" type="com.etnlgravtnl.modules.model.CrowdfundReturnset" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="PROJECT_NO" property="projectNo" jdbcType="INTEGER" />
+    <result column="RETURN_NO" property="returnNo" jdbcType="INTEGER" />
+    <result column="NUMBER_LIMITS" property="numberLimits" jdbcType="INTEGER" />
+    <result column="RETURN_CONTENT" property="returnContent" jdbcType="VARCHAR" />
+    <result column="RETURN_TYPE" property="returnType" jdbcType="VARCHAR" />
+    <result column="RETURN_DATE" property="returnDate" jdbcType="INTEGER" />
+    <result column="STATE" property="state" jdbcType="VARCHAR" />
+    <result column="RETURN_IMAGE_DESC" property="returnImageDesc" jdbcType="VARCHAR" />
+    <result column="RETURN_CHANNEL" property="returnChannel" jdbcType="VARCHAR" />
+    <result column="APP_PERF_SCALE" property="appPerfScale" jdbcType="DECIMAL" />
+    <result column="PRICE" property="price" jdbcType="DECIMAL" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="POST_FLAG" property="postFlag" jdbcType="BIT" />
+    <result column="COURIER_FEES" property="courierFees" jdbcType="DECIMAL" />
+    <result column="INVOICE_FLAG" property="invoiceFlag" jdbcType="BIT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, PROJECT_NO, RETURN_NO, NUMBER_LIMITS, RETURN_CONTENT, RETURN_TYPE, RETURN_DATE, 
+    STATE, RETURN_IMAGE_DESC, RETURN_CHANNEL, APP_PERF_SCALE, PRICE, REMARK, POST_FLAG, 
+    COURIER_FEES, INVOICE_FLAG
+  </sql>
+
+  <select id="getListByProjectNo" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from crowdfund_returnset
+    where PROJECT_NO = #{projectNo,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByProjectNo" parameterType="java.lang.Integer" >
+    delete from crowdfund_returnset
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.etnlgravtnl.modules.model.CrowdfundReturnset" >
+    insert into crowdfund_returnset (ID, PROJECT_NO, RETURN_NO, 
+      NUMBER_LIMITS, RETURN_CONTENT, RETURN_TYPE, 
+      RETURN_DATE, STATE, RETURN_IMAGE_DESC, 
+      RETURN_CHANNEL, APP_PERF_SCALE, PRICE, 
+      REMARK, POST_FLAG, COURIER_FEES, 
+      INVOICE_FLAG)
+    values (#{id,jdbcType=INTEGER}, #{projectNo,jdbcType=INTEGER}, #{returnNo,jdbcType=INTEGER}, 
+      #{numberLimits,jdbcType=INTEGER}, #{returnContent,jdbcType=VARCHAR}, #{returnType,jdbcType=VARCHAR}, 
+      #{returnDate,jdbcType=INTEGER}, #{state,jdbcType=VARCHAR}, #{returnImageDesc,jdbcType=VARCHAR}, 
+      #{returnChannel,jdbcType=VARCHAR}, #{appPerfScale,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, 
+      #{remark,jdbcType=VARCHAR}, #{postFlag,jdbcType=BIT}, #{courierFees,jdbcType=DECIMAL}, 
+      #{invoiceFlag,jdbcType=BIT})
+  </insert>
+
+  <update id="update" parameterType="com.etnlgravtnl.modules.model.CrowdfundReturnset" >
+    update crowdfund_returnset
+    <set >
+      <if test="projectNo != null" >
+        PROJECT_NO = #{projectNo,jdbcType=INTEGER},
+      </if>
+      <if test="returnNo != null" >
+        RETURN_NO = #{returnNo,jdbcType=INTEGER},
+      </if>
+      <if test="numberLimits != null" >
+        NUMBER_LIMITS = #{numberLimits,jdbcType=INTEGER},
+      </if>
+      <if test="returnContent != null" >
+        RETURN_CONTENT = #{returnContent,jdbcType=VARCHAR},
+      </if>
+      <if test="returnType != null" >
+        RETURN_TYPE = #{returnType,jdbcType=VARCHAR},
+      </if>
+      <if test="returnDate != null" >
+        RETURN_DATE = #{returnDate,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        STATE = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="returnImageDesc != null" >
+        RETURN_IMAGE_DESC = #{returnImageDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="returnChannel != null" >
+        RETURN_CHANNEL = #{returnChannel,jdbcType=VARCHAR},
+      </if>
+      <if test="appPerfScale != null" >
+        APP_PERF_SCALE = #{appPerfScale,jdbcType=DECIMAL},
+      </if>
+      <if test="price != null" >
+        PRICE = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="postFlag != null" >
+        POST_FLAG = #{postFlag,jdbcType=BIT},
+      </if>
+      <if test="courierFees != null" >
+        COURIER_FEES = #{courierFees,jdbcType=DECIMAL},
+      </if>
+      <if test="invoiceFlag != null" >
+        INVOICE_FLAG = #{invoiceFlag,jdbcType=BIT},
+      </if>
+    </set>
+    where PROJECT_NO = #{projectNo,jdbcType=INTEGER}
+  </update>
+
+</mapper>

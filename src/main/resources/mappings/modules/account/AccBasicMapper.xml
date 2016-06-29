@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.milliongravity.modules.dao.account.AccBasicDao">
+  <resultMap id="BaseResultMap" type="com.etnlgravtnl.modules.model.AccBasic">
+    <id column="USER_ID" jdbcType="INTEGER" property="userId" />
+    <result column="BALANCE" jdbcType="DECIMAL" property="balance" />
+    <result column="FROZEN_AMT" jdbcType="DECIMAL" property="frozenAmt" />
+    <result column="PAY_PWD" jdbcType="VARCHAR" property="payPwd" />
+    <result column="STATUS" jdbcType="BIT" property="status" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    USER_ID, BALANCE, FROZEN_AMT, PAY_PWD, STATUS
+  </sql>
+
+  <select id="getPayPwd" resultType="java.lang.String" parameterType="java.lang.Integer" >
+    SELECT PAY_PWD
+    FROM  acc_basic
+    WHERE USER_ID = #{userId,jdbcType=INTEGER}
+  </select>
+  <update id="updatePayPwd" parameterType="com.etnlgravtnl.modules.model.AccBasic">
+    UPDATE acc_basic SET  PAY_PWD = #{payPwd,jdbcType=VARCHAR}
+    WHERE USER_ID = #{userId,jdbcType=INTEGER}
+  </update>
+</mapper>
