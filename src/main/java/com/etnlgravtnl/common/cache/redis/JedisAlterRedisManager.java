@@ -5,12 +5,14 @@ import java.util.Map;
 import java.util.Set;
 
 import com.etnlgravtnl.common.config.Global;
-import com.etnlgravtnl.common.exception.MapperSupport.Constant.WebExceptionType;
+import com.etnlgravtnl.common.exception.Constant.WebExceptionType;
 import com.etnlgravtnl.common.exception.MapperSupport.WebActionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.SortingParams;
 
 import javax.inject.Singleton;
@@ -25,8 +27,19 @@ import javax.inject.Singleton;
 @Component("jedisAlterRedisManager")
 public class JedisAlterRedisManager {
 
-    private Jedis jedis = RedisPoolManager.createInstance();
+    @Autowired
+    JedisPool jedisPool;
 
+/*
+
+    public Jedis getJedis() {
+        return jedis;
+    }
+
+    public void setJedis(Jedis jedis) {
+        this.jedis = jedis;
+    }
+*/
     ////////////////////Basic Functions(String related) - Start /////////////////////////////
 
     /**
@@ -40,15 +53,26 @@ public class JedisAlterRedisManager {
      */
     public  String getCounter4TypeAndIp(String ip,String type)
     {
-        int expire=getExpireTime4Counter(type);
-        String key=ip+"/"+type+".key";
-        String count="";
-        if(!jedis.exists(key))
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            int expire=getExpireTime4Counter(type);
+            String key=ip+"/"+type+".key";
+            String count="";
+            if(!jedis.exists(key))
+            {
+                jedis.setex(key,expire,"0");
+            }
+
+            return jedis.get(key);
+        }catch (Exception ex)
         {
-            jedis.setex(key,expire,"0");
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
         }
 
-        return jedis.get(key);
     }
 
     /**
@@ -62,15 +86,25 @@ public class JedisAlterRedisManager {
      */
     public  long incrCounter4TypeAndIp(String ip,String type)
     {
-        int expire=getExpireTime4Counter(type);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            int expire=getExpireTime4Counter(type);
 
-        String key=ip+"/"+type+".key";
+            String key=ip+"/"+type+".key";
 
-        if(!jedis.exists(key))
+            if(!jedis.exists(key))
+            {
+                jedis.setex(key,expire,"0");
+            }
+            return jedis.incr(key);
+        }catch (Exception ex)
         {
-            jedis.setex(key,expire,"0");
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
         }
-        return jedis.incr(key);
     }
 
     /**
@@ -84,14 +118,24 @@ public class JedisAlterRedisManager {
      */
     public  long decrounter4TypeAndIp(String ip,String type)
     {
-        int expire=getExpireTime4Counter(type);
-        String key=ip+"/"+type+".key";
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            int expire=getExpireTime4Counter(type);
+            String key=ip+"/"+type+".key";
 
-        if(!jedis.exists(key))
+            if(!jedis.exists(key))
+            {
+                jedis.setex(key,expire,"0");
+            }
+            return jedis.decr(key);
+        }catch (Exception ex)
         {
-            jedis.setex(key,expire,"0");
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
         }
-        return jedis.decr(key);
     }
     /**
      * @Name:
@@ -104,14 +148,21 @@ public class JedisAlterRedisManager {
      */
     public int getExpireTime4Counter(String type)
     {
+
         int expire=0;
+        Jedis jedis=null;
         try {
+            jedis=jedisPool.getResource();
             expire=Global.counter.get(type);
+            return expire;
         }catch (Exception ex)
         {
             throw new WebActionException(WebExceptionType.COUNTERNOTFOUND,type);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
         }
-        return expire;
+
     }
 
     /**
@@ -119,8 +170,18 @@ public class JedisAlterRedisManager {
      * @param entries
      */
     public void set(Map<String, String> entries) {
-        for (Map.Entry<String, String> entry : entries.entrySet()) {
-            jedis.set(entry.getKey(), entry.getValue());
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            for (Map.Entry<String, String> entry : entries.entrySet()) {
+                jedis.set(entry.getKey(), entry.getValue());
+            }
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
         }
     }
 
@@ -130,7 +191,17 @@ public class JedisAlterRedisManager {
      * @param value
      */
     public void set(String key, String value) {
-        jedis.set(key, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            jedis.set(key, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -138,8 +209,18 @@ public class JedisAlterRedisManager {
      * @param entries
      */
     public void setnx(Map<String, String> entries) {
-        for (Map.Entry<String, String> entry : entries.entrySet()) {
-            jedis.setnx(entry.getKey(), entry.getValue());
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            for (Map.Entry<String, String> entry : entries.entrySet()) {
+                jedis.setnx(entry.getKey(), entry.getValue());
+            }
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
         }
     }
 
@@ -149,7 +230,17 @@ public class JedisAlterRedisManager {
      * @param value
      */
     public void setnx(String key, String value) {
-        jedis.setnx(key, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            jedis.setnx(key, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -159,7 +250,17 @@ public class JedisAlterRedisManager {
      * @param value
      */
     public void setKeyLive(String key, int live, String value) {
-        jedis.setex(key, live, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            jedis.setex(key, live, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -168,7 +269,17 @@ public class JedisAlterRedisManager {
      * @param value
      */
     public void append(String key, String value) {
-        jedis.append(key, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            jedis.append(key, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -177,7 +288,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public String getValue(String key) {
-        return jedis.get(key);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.get(key);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -186,7 +307,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public List<String> getValues(String... keys) {
-        return jedis.mget(keys);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.mget(keys);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -195,7 +326,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Long removeValue(String key) {
-        return jedis.del(key);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.del(key);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -204,7 +345,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Long removeValues(String... keys) {
-        return jedis.del(keys);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.del(keys);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -213,21 +364,36 @@ public class JedisAlterRedisManager {
      * @return
      */
     public boolean exists(String key) {
-        return jedis.exists(key);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.exists(key);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
-    /**
-     * Release the resource
-     */
-    public void returnSource() {
-        RedisPoolManager.returnResource(jedis);
-    }
+
 
     /**
      * Clear the cache
      */
     public String clear() {
-        return jedis.flushDB();
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.flushDB();
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -235,7 +401,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public long calculateSize() {
-        return jedis.dbSize();
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.dbSize();
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -245,7 +421,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public String getSet(String key, String value) {
-        return jedis.getSet(key, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.getSet(key, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -256,7 +442,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public String getRange(String key, int startOffset, int endOffset) {
-        return jedis.getrange(key, startOffset, endOffset);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.getrange(key, startOffset, endOffset);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     ////////////////////Basic Functions(String related) - End /////////////////////////////
@@ -282,7 +478,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public long add2List(String listName, String... values) {
-        return jedis.lpush(listName, values);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.lpush(listName, values);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -291,7 +497,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public long getListSize(String listName) {
-        return jedis.llen(listName);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.llen(listName);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
 
@@ -303,7 +519,17 @@ public class JedisAlterRedisManager {
      * @param value
      */
     public void updateList(String listName, int index, String value) {
-        jedis.lset(listName, index, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            jedis.lset(listName, index, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -313,7 +539,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public String getIndexValue(String listName, int index) {
-        return jedis.lindex(listName, index);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.lindex(listName, index);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -331,7 +567,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public long removeLValue(String listName, int count, String value) {
-        return jedis.lrem(listName, count, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.lrem(listName, count, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -343,7 +589,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public String removeOutterValue(String listName, int start, int end) {
-        return jedis.ltrim(listName, start, end);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.ltrim(listName, start, end);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -352,7 +608,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public String popList(String listName) {
-        return jedis.lpop(listName);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.lpop(listName);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -376,7 +642,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public List<String> getListValues(String listName, long start, long end) {
-        return jedis.lrange(listName, start, end);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.lrange(listName, start, end);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -386,7 +662,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public List<String> getAllListValues(String listName) {
-        return jedis.lrange(listName, 0, -1);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.lrange(listName, 0, -1);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -395,7 +681,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public List<String> sort(String listName) {
-        return jedis.sort(listName);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.sort(listName);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -406,7 +702,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Long sort(String key, SortingParams params, String dstKey) {
-        return jedis.sort(key, params, dstKey);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.sort(key, params, dstKey);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     ////////////////////List Functions - End /////////////////////////////
@@ -420,7 +726,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public boolean exists(String setName, String member) {
-        return jedis.sismember(setName, member);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.sismember(setName, member);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -430,7 +746,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public long add2Set(String setName, String... members) {
-        return jedis.sadd(setName, members);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.sadd(setName, members);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -440,7 +766,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Set<String> getAllSetValues(String setName) {
-        return jedis.smembers(setName);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.smembers(setName);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -451,7 +787,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Long removeSValues(String setName, String ... members) {
-        return jedis.srem(setName, members);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.srem(setName, members);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -460,7 +806,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public String popSet(String setName) {
-        return jedis.spop(setName);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.spop(setName);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -470,7 +826,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Set<String> intersection(String... sets) {
-        return jedis.sinter(sets);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.sinter(sets);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -480,7 +846,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Set<String> union(String... sets) {
-        return jedis.sunion(sets);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.sunion(sets);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -491,7 +867,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Set<String> diff(String... sets) {
-        return jedis.sdiff(sets);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.sdiff(sets);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     ////////////////////Set Functions - End /////////////////////////////
@@ -511,7 +897,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public long add2SSet(String ssetName, double score, String member) {
-        return jedis.zadd(ssetName, score, member);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.zadd(ssetName, score, member);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -520,7 +916,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public long card(String sset) {
-        return jedis.zcard(sset);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.zcard(sset);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -531,7 +937,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Set<String> getSubSet(String sset, long start, long end) {
-        return jedis.zrange(sset, start, end);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.zrange(sset, start, end);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -541,7 +957,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Double getIndex(String sset, String member) {
-        return jedis.zscore(sset, member);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.zscore(sset, member);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -551,7 +977,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Long removeSSValues(String sset, String ...members) {
-        return jedis.zrem(sset, members);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.zrem(sset, members);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -560,7 +996,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Set<String> getAllSSValues(String sset) {
-        return jedis.zrange(sset, 0, -1);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.zrange(sset, 0, -1);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -571,7 +1017,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Long countRange(String sset, double start, double end) {
-        return jedis.zcount(sset, start, end);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.zcount(sset, start, end);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     ////////////////////Sorted Set Functions - End /////////////////////////////
@@ -586,7 +1042,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public long push(String map, String key, String value) {
-        return jedis.hset(map, key, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.hset(map, key, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -596,7 +1062,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public boolean hexists(String map, String key) {
-        return jedis.hexists(map, key);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.hexists(map, key);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -606,7 +1082,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public String getValue(String map, String key) {
-        return jedis.hget(map, key);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.hget(map, key);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -617,7 +1103,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public List<String> getHValues(String map, String... keys) {
-        return jedis.hmget(map, keys);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.hmget(map, keys);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -627,7 +1123,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Long removeHValues(String map, String ... keys) {
-        return jedis.hdel(map, keys);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.hdel(map, keys);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -638,7 +1144,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Long increment(String map, String key, long value) {
-        return jedis.hincrBy(map, key, value);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.hincrBy(map, key, value);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -647,7 +1163,17 @@ public class JedisAlterRedisManager {
      * @return
      */
     public Set<String> getKeys(String map) {
-        return jedis.hkeys(map);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.hkeys(map);
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     /**
@@ -656,7 +1182,18 @@ public class JedisAlterRedisManager {
      * @return
      */
     public List<String> getValues(String map) {
-        return jedis.hvals(map);
+        Jedis jedis=null;
+        try {
+            jedis=jedisPool.getResource();
+            return jedis.hvals(map);
+
+        }catch (Exception ex)
+        {
+            throw  new WebActionException(ex,WebExceptionType.JEDISOPRATOREXCEPTION,jedis);
+        }finally {
+            if(jedis!=null)
+                jedis.close();
+        }
     }
 
     ////////////////////Hash Map Functions - End //////////////////////////////

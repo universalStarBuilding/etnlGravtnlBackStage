@@ -1,6 +1,6 @@
 package com.etnlgravtnl.system.service.impl;
 
-import com.etnlgravtnl.common.service.CrudService;
+import com.etnlgravtnl.common.service.impl.CrudServiceImpl;
 import com.etnlgravtnl.system.dao.MessageTemplatesDao;
 import com.etnlgravtnl.system.entity.MessageTemplates;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class MessageTemplatesServiceImpl extends CrudService<MessageTemplatesDao,MessageTemplates>
+public class MessageTemplatesServiceImpl extends CrudServiceImpl<MessageTemplatesDao,MessageTemplates>
 {
     @Autowired
     private MessageTemplatesDao messageTemplatesDao;

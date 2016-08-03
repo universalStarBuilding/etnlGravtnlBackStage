@@ -1,5 +1,6 @@
 package com.etnlgravtnl.common.exception.MapperSupport;
 
+import com.etnlgravtnl.common.exception.Constant.WebExceptionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +23,10 @@ public class ExceptionMapperSupport implements ExceptionMapper<Throwable>{
         }
         if(exception instanceof AbstractException ) {
             AbstractException exception1 = (AbstractException) exception;
-            return Response.status(500).entity("[{message:\""+exception1.getUserDefindExType()+".\"}]").type("application/json").build();
+            return Response.status(exception1.getHttpStatus().value()).entity("[{message:\""+exception1.getUserDefindExType()+".\"}]").type("application/json").build();
         }
        // return Response.status(500).entity("{exceptionMsg:\""+exception1.getUserDefindExType()+".\"}").type("application/json").build();
-        return Response.status(500).entity("[{message:\""+"系统异常"+".\"}]").type("application/json").build();
+        return Response.status(500).entity("[{message:\""+ WebExceptionType.UNKNOWNEXCEPTION+".\"}]").type("application/json").build();
     }
 }
 

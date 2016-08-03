@@ -4,6 +4,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -182,6 +183,13 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		return "下午";
 	}
 
+	/**
+	 * 获取此时此刻是上午还是下午
+	 * @return
+	 */
+	public static long getTimeInterval(Date subtrahend,Date minuend){
+		return subtrahend.getTime()-minuend.getTime();
+	}
 
 	/**
 	 * 比较两个时间的早晚
@@ -216,6 +224,13 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 			return false;
 		*/
 	}
+
+	public static Date getDate4Later(int laterMinutes)
+	{
+		Calendar calendar=Calendar.getInstance();
+		calendar.add(Calendar.MINUTE,laterMinutes);
+		return calendar.getTime();
+	}
 	
 	/**
 	 * @param args
@@ -226,5 +241,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 //		System.out.println(getDate("yyyy年MM月dd日 E"));
 //		long time = new Date().getTime()-parseDate("2012-11-19").getTime();
 //		System.out.println(time/(24*60*60*1000));
+
 	}
 }

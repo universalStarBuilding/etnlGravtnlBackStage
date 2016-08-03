@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.milliongravity.system.dao.LogAccessDao" >
+<mapper namespace="com.etnlgravtnl.system.dao.LogAccessDao" >
   <resultMap id="BaseResultMap" type="com.etnlgravtnl.system.entity.LogAccess" >
     <id column="ID" property="id" jdbcType="VARCHAR" />
     <result column="TYPE" property="type" jdbcType="CHAR" />
@@ -22,6 +22,52 @@
   <sql id="Blob_Column_List" >
     PARAMS, EXCEPTION
   </sql>
+
+  <sql id="base_where">
+    <where>
+
+      <if test="id!=null and id!=''" >
+        and id = #{id}
+      </if>
+      <if test="type!=null and type!=''" >
+        and TYPE = #{type}
+      </if>
+      <if test="title!=null and title!=''" >
+        and TITLE = #{title}
+      </if>
+      <if test="createBy!=null and createBy!=''" >
+        and CREATE_BY = #{createBy}
+      </if>
+      <if test="createDate!=null and createDate!=''" >
+        and CREATE_DATE = #{createDate}
+      </if>
+      <if test="remoteAddr!=null and remoteAddr!=''" >
+        and REMOTE_ADDR = #{remoteAddr}
+      </if>
+      <if test="userAgent!=null and userAgent!=''" >
+        and USER_AGENT = #{userAgent}
+      </if>
+      <if test="requestUri!=null and requestUri!=''" >
+        and REQUEST_URI = #{requestUri}
+      </if>
+      <if test="method!=null and method!=''" >
+        and METHOD = #{method}
+      </if>
+      <if test="timeCost!=null and timeCost!=''" >
+        and TIME_COST = #{timeCost}
+      </if>
+      <if test="leadInvestor!=null and leadInvestor!=''" >
+        and lead_investor = #{leadInvestor}
+      </if>
+      <if test="params!=null and params!=''" >
+        and PARAMS = #{params}
+      </if>
+      <if test="exception!=null and exception!=''" >
+        and EXCEPTION = #{leadInvestor}
+      </if>
+
+    </where>
+  </sql>
   <select id="coutPageList" resultType="java.lang.Long" parameterType="com.etnlgravtnl.system.entity.LogAccess" >
     select 
      count(*)
@@ -37,13 +83,13 @@
     limit #{startPage},#{rows}
   </select>
 
-  <select id="select" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
     from log_access
-    where ID = #{id,jdbcType=VARCHAR}
+    <include refid="base_where"></include>
   </select>
 
 

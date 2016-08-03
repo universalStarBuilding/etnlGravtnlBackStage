@@ -3,8 +3,8 @@ package com.etnlgravtnl.common.utils;
 import com.etnlgravtnl.common.config.CommonDictionaryConfig;
 import com.etnlgravtnl.common.session.VirtualSession;
 import com.etnlgravtnl.common.session.VirtualSessionManager;
-import com.etnlgravtnl.modules.model.User;
 import com.etnlgravtnl.system.dao.LogAccessDao;
+import com.etnlgravtnl.system.entity.AdminUser;
 import com.etnlgravtnl.system.entity.LogAccess;
 
 
@@ -29,7 +29,7 @@ public class LogUtils {
 	 * @Author: junz（作者）
 	 * @Version: V1.00 （版本号）
 	 * @Create Date: 2016-06-10（创建日期）
-	 * @param exception 异常  title 记录日志的url描述 timeCost耗时
+	 * @param ex 异常  title 记录日志的url描述 timeCost耗时
 	 * @Description:
 	 * 保存访问日志日志记录
 	 */
@@ -38,10 +38,10 @@ public class LogUtils {
     	String tokenText=null;
     	if (authHeader!=null)
     		tokenText=authHeader;
-		User user=null;
+		AdminUser user=null;
 		VirtualSession session= VirtualSessionManager.getInstance().getSession(tokenText, false);
 		if(tokenText!=null)
-			user = (User)session.getAttribute("user");
+			user = (AdminUser) session.getAttribute("user");
 		LogAccess log = new LogAccess();
 		log.setCreateBy(user==null?"visitor":String.valueOf(user.getId()));
 		log.setCreateDate(DateUtils.getDateTime());
@@ -108,7 +108,7 @@ public class LogUtils {
 		Map<String, String> menuMap = (Map<String, String>)CacheUtils.get(CACHE_MENU_NAME_PATH_MAP);
 		if (menuMap == null){
 			menuMap = Maps.newHashMap();
-			List<Menu> menuList = menuDao.findAllList(new Menu());
+			List<Menu> menuList = MenuDao.findAllList(new Menu());
 			for (Menu menu : menuList){
 				// 获取菜单名称路径（如：系统设置-机构用户-用户管理-编辑）
 				String namePath = "";

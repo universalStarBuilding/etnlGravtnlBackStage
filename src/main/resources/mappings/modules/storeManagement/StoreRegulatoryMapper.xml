@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.etnlgravtnl.modules.storeManagement.dao.StoreRegulatoryDao" >
+  <resultMap id="BaseResultMap" type="com.etnlgravtnl.modules.storeManagement.entity.SellShops" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="USER_ID" property="userId" jdbcType="INTEGER" />
+    <result column="NAME" property="storeName" jdbcType="VARCHAR" />
+    <result column="LOGO" property="logo" jdbcType="VARCHAR" />
+    <result column="INDUSTRY_ID" property="industryId" jdbcType="INTEGER" />
+    <result column="INDUSTRY_NAME" property="industryName" jdbcType="INTEGER" />
+    <result column="SIGNATURE" property="signature" jdbcType="VARCHAR" />
+    <result column="DESC" property="storeDesc" jdbcType="VARCHAR" />
+    <result column="STATUS" property="statusCode" jdbcType="VARCHAR" />
+    <result column="STATUSNAME" property="statusName" jdbcType="VARCHAR" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="AUTH" property="auth" jdbcType="VARCHAR" />
+    <result column="BUSI_PIC" property="busiPic" jdbcType="VARCHAR" />
+    <result column="APPLY_PIC" property="applyPic" jdbcType="VARCHAR" />
+    <result column="AREA" property="area" jdbcType="VARCHAR" />
+    <result column="POSTCODE" property="postcode" jdbcType="VARCHAR" />
+    <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+    <result column="FAX" property="fax" jdbcType="VARCHAR" />
+    <result column="TRADEMARK" property="trademark" jdbcType="VARCHAR" />
+    <result column="REGIST_NO" property="registNo" jdbcType="VARCHAR" />
+    <result column="WEBSITE" property="website" jdbcType="VARCHAR" />
+    <result column="MAIN_PROD" property="mainProd" jdbcType="VARCHAR" />
+    <result column="MANAGE" property="manage" jdbcType="VARCHAR" />
+    <result column="CUSTOM" property="custom" jdbcType="VARCHAR" />
+    <result column="EMPLOYEE" property="employee" jdbcType="VARCHAR" />
+    <result column="TURNOVER" property="turnover" jdbcType="VARCHAR" />
+    <result column="FACTORY" property="factory" jdbcType="VARCHAR" />
+    <result column="MARKET" property="market" jdbcType="VARCHAR" />
+    <result column="EXPORTS" property="exports" jdbcType="VARCHAR" />
+    <result column="QUALITY" property="quality" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, USER_ID, NAME, LOGO, INDUSTRY_ID, SIGNATURE, DESC, CREATE_DATE
+  </sql>
+  <select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sell_shops
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <!--店铺监管查询信息，全量查询-->
+  <select id="getShopsInfoList" resultMap="BaseResultMap"   parameterType="com.etnlgravtnl.modules.storeManagement.entity.SellShops" >
+    SELECT
+      A.*
+    FROM (
+      SELECT
+          A.ID
+          ,A.USER_ID AS userId
+          ,B.NAME_LOGIN AS userName
+          ,A.NAME as storeName
+          ,A.INDUSTRY_ID as industryId
+          ,C.NAME as industryName
+          ,A.SIGNATURE as signature
+          ,A.DESC as storeDesc
+          ,A.CREATE_DATE as createDate
+          ,A.STATUS as statusCode
+          ,COALESCE(E.DESCRIPTION,A.STATUS) AS statusName
+      FROM sell_shops A
+          JOIN user B
+              ON A.USER_ID=B.ID
+              AND B.USER_TYPE='2'
+          JOIN industry C
+              ON A.INDUSTRY_ID=C.NO
+              LEFT JOIN sys_dict E
+          ON E.TYPE='STORESTATUS'
+              AND A.STATUS=E.VALUE
+     ) AS A
+    WHERE 1=1
+    <if test="searchSql != null" >
+        ${searchSql}
+    </if>
+    <if test="orderSqlText != null" >
+        ${orderSqlText}
+    </if>
+    LIMIT ${startPage},${endPage}
+  </select>
+
+        <!--店铺监管查询信息，全量查询-->
+  <select id="getTotalShopsCount" resultType="java.lang.Integer"   parameterType="com.etnlgravtnl.modules.storeManagement.entity.SellShops" >
+
+    SELECT
+        COUNT(1) AS totalCount
+    FROM (
+    SELECT
+        A.*
+    FROM sell_shops A
+        JOIN user B
+            ON A.USER_ID=B.ID
+            AND B.USER_TYPE='2'
+        JOIN industry C
+            ON A.INDUSTRY_ID=C.NO
+        LEFT JOIN sys_dict E
+            ON E.TYPE='STORESTATUS'
+            AND A.STATUS=E.VALUE
+    ) AS A
+    WHERE 1=1
+    <if test="searchSql != null" >
+      ${searchSql}
+    </if>
+  </select>
+  <!--店铺认证查询，全量查询-->
+  <select id="getCertifiedSellerInfo" resultMap="BaseResultMap"   parameterType="com.etnlgravtnl.modules.storeManagement.entity.SellShops" >
+    SELECT
+      A.*
+    FROM (
+      SELECT
+          A.ID
+          ,A.APPLY_PIC AS applyPic
+          ,A.BUSI_PIC AS busiPic
+          ,COALESCE(E.DESCRIPTION,"待认证") AS auth
+      FROM sell_shops A
+          JOIN user B
+              ON A.USER_ID=B.ID
+              AND B.USER_TYPE='2'
+          LEFT JOIN sys_dict E
+              ON E.TYPE='CERTIFIEDSTATUS'
+                  AND A.AUTH=E.VALUE
+     ) AS A
+    WHERE 1=1
+    <if test="searchSql != null" >
+        ${searchSql}
+    </if>
+    <if test="orderSqlText != null" >
+        ${orderSqlText}
+    </if>
+    LIMIT ${startPage},${endPage}
+  </select>
+
+        <!--店铺认证查询，全量查询-->
+  <select id="getTotalCertifiedSellerCount" resultType="java.lang.Integer"   parameterType="com.etnlgravtnl.modules.storeManagement.entity.SellShops" >
+
+    SELECT
+        COUNT(1) AS totalCount
+    FROM (
+    SELECT
+        A.*
+    FROM sell_shops A
+        JOIN user B
+            ON A.USER_ID=B.ID
+            AND B.USER_TYPE='2'
+        LEFT JOIN sys_dict E
+            ON E.TYPE='CERTIFIEDSTATUS'
+            AND A.STATUS=E.VALUE
+    ) AS A
+    WHERE 1=1
+    <if test="searchSql != null" >
+      ${searchSql}
+    </if>
+  </select>
+
+
+  <delete id="delete" parameterType="java.lang.Integer" >
+    delete from sell_shops
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.etnlgravtnl.modules.storeManagement.entity.SellShops" >
+    insert into sell_shops
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="userId != null" >
+        USER_ID,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="logo != null" >
+        LOGO,
+      </if>
+      <if test="industryId != null" >
+        INDUSTRY_ID,
+      </if>
+      <if test="signature != null" >
+        SIGNATURE,
+      </if>
+      <if test="desc != null" >
+        DESC,
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="logo != null" >
+        #{logo,jdbcType=VARCHAR},
+      </if>
+      <if test="industryId != null" >
+        #{industryId,jdbcType=INTEGER},
+      </if>
+      <if test="signature != null" >
+        #{signature,jdbcType=VARCHAR},
+      </if>
+      <if test="desc != null" >
+        #{desc,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="certifiedSeller" parameterType="java.util.Map" >
+    update sell_shops
+    <set >
+      AUTH =  #{auth,jdbcType=VARCHAR},
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+
+
+
+  <update id="logicallyDeleted" parameterType="java.lang.Integer" >
+    update sell_shops
+    <set >
+        STATUS = 'DELETE',
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateStoreStatus" parameterType="java.util.Map" >
+    update sell_shops
+    <set>
+      STATUS =  #{statusCode,jdbcType=VARCHAR}
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="update" parameterType="com.etnlgravtnl.modules.storeManagement.entity.SellShops" >
+    update sell_shops
+    <set >
+      <if test="userId != null" >
+        USER_ID = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test=" storeName!= null" >
+        NAME = #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="logo != null" >
+        LOGO = #{logo,jdbcType=VARCHAR},
+      </if>
+      <if test="industryId != null" >
+        INDUSTRY_ID = #{industryId,jdbcType=INTEGER},
+      </if>
+      <if test="signature != null" >
+        SIGNATURE = #{signature,jdbcType=VARCHAR},
+      </if>
+      <if test="storeDesc != null" >
+        `DESC` = #{storeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="statusCode != null" >
+        STATUS = #{statusCode,jdbcType=VARCHAR}
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.etnlgravtnl.modules.storeManagement.entity.SellShops" >
+    update sell_shops
+    set USER_ID = #{userId,jdbcType=INTEGER},
+      NAME = #{name,jdbcType=VARCHAR},
+      LOGO = #{logo,jdbcType=VARCHAR},
+      INDUSTRY_ID = #{industryId,jdbcType=INTEGER},
+      SIGNATURE = #{signature,jdbcType=VARCHAR},
+      DESC = #{desc,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

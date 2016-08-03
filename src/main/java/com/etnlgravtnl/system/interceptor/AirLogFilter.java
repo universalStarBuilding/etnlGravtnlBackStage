@@ -1,5 +1,6 @@
 package com.etnlgravtnl.system.interceptor;
 
+
 import com.etnlgravtnl.common.utils.LogUtils;
 import org.glassfish.jersey.message.internal.HeaderUtils;
 import org.slf4j.Logger;
@@ -21,6 +22,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @PreMatching
 public class AirLogFilter implements ContainerRequestFilter, ClientRequestFilter, ContainerResponseFilter, ClientResponseFilter {
+
+
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AirLogFilter.class);
     private static final String NOTIFICATION_PREFIX = "* ";
     private static final String SERVER_REQUEST = "> ";
@@ -118,6 +122,7 @@ public class AirLogFilter implements ContainerRequestFilter, ClientRequestFilter
 
         // 保存日志
         LogUtils.saveAccessLog(requestContext, null,null,timeCost);
+       // RedisPoolManager.returnResource(jedisAlterRedisManager.getJedis());
         /*long id = logSequence.incrementAndGet();
         StringBuilder b = new StringBuilder();
         printResponseLine(SERVER_RESPONSE, b, id, responseContext.getStatus());

@@ -2,7 +2,7 @@ package com.etnlgravtnl.system.webservice;
 
 import com.etnlgravtnl.system.entity.LogAccess;
 import com.etnlgravtnl.system.entity.ResultAPI;
-import com.etnlgravtnl.system.service.LogAccessService;
+import com.etnlgravtnl.system.service.LogAccessServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
 public class LogAccessController {
 
     @Autowired
-    private LogAccessService logAccessService;
+    private LogAccessServiceImpl logAccessService;
 
     @GET
     @Path("get")

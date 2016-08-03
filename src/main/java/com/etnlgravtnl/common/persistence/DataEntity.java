@@ -24,12 +24,32 @@ public abstract class DataEntity<T> extends  BaseEntity<T>{
 
 	protected int page = 1;
 	protected int rows;
-	protected String sort;
+	protected String sortRule;
 	protected String order;
 	protected long startPage;
 	protected long endPage;
 	protected String defaultSort;
+	protected String searchSql;
+	protected String orderSqlText;
+
+	public String getOrderSqlText() {
+		return orderSqlText;
+	}
+
+	public void setOrderSqlText(String orderSqlText) {
+		this.orderSqlText = orderSqlText;
+	}
+
+	public String getSearchSql() {
+		return searchSql;
+	}
+
+	public void setSearchSql(String searchSql) {
+		this.searchSql = searchSql;
+	}
+
 	protected Map<String, Object> paramMap = new HashMap();
+
 
 
 	public boolean isNewRecord() {
@@ -56,12 +76,12 @@ public abstract class DataEntity<T> extends  BaseEntity<T>{
 		this.rows = rows;
 	}
 
-	public String getSort() {
-		return sort;
+	public String getSortRule() {
+		return sortRule;
 	}
 
-	public void setSort(String sort) {
-		this.sort = sort;
+	public void setSortRule(String sortRule) {
+		this.sortRule = sortRule;
 	}
 
 	public String getOrder() {

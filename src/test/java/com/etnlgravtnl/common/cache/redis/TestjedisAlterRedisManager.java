@@ -6,6 +6,9 @@ import javax.annotation.Resource;
 import com.etnlgravtnl.common.cache.redis.testbase.SpringBaseTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 //import com.chuanliu.platform.activity.basic.test.SpringBaseTest;
 
 
@@ -20,10 +23,24 @@ public class TestjedisAlterRedisManager extends SpringBaseTest {
     @Resource
     private JedisAlterRedisManager jedisAlterRedisManager;
 
+    @Autowired
+    JedisPool jedisPool;
+
     @Before
     public void init() {
         printHighlight(jedisAlterRedisManager.hashCode() + "");
     }
+
+    @Test
+    public void springJedisTest()
+    {
+        Jedis jedis= jedisPool.getResource();
+        jedis.set("josh", "WangSheng");
+        System.out.println(jedis.get("josh"));
+        jedis.flushAll();
+        jedis.close();
+    }
+
     @Test
     public void counterTest()
     {

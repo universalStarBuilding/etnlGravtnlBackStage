@@ -31,7 +31,7 @@ public class WebApplication extends ResourceConfig{
         register(ValidationConfigurationContextResolver.class);
         register(ExceptionMapperSupport.class);
         //注册日志记录
-        register(AirLogFilter.class);
+       // register(AirLogFilter.class);
         // MVC.
         register(JspMvcFeature.class);
         //注册注解工厂
